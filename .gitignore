@@ -41,6 +41,7 @@ wheels/
 
 # Data
 data/raw/*.csv
+!data/raw/BankChurners.csv
 data/raw/*.xlsx
 !data/raw/.gitkeep
 data/processed/*.csv
@@ -54,9 +55,6 @@ models/*.joblib
 # Predictions
 predictions.csv
 
-# Documentation and Project Explanations
-docs/
-project_explanation/
 
 # OS
 .DS_Store
