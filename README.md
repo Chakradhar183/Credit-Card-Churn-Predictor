@@ -2,8 +2,6 @@
 
 End-to-end machine learning project that predicts which credit card customers are likely to churn, built with Python, XGBoost, and Streamlit.
 
-![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)
-![License](https://img.shields.io/badge/License-MIT-green.svg)
 
 **Live Demo:** [bankchurnerscsv-guwhaaalen4z8x8gkkht5s.streamlit.app](https://bankchurnerscsv-guwhaaalen4z8x8gkkht5s.streamlit.app/)
 
@@ -195,24 +193,6 @@ Opens at `http://localhost:8501`. The app has two pages:
 - **Prediction** - enter customer details and get a churn probability with a gauge chart and risk level
 - **Dashboard** - explore the dataset with filters for gender, income, card type, age, and risk level; view distribution charts and a table of the top 50 highest-risk customers
 
-### Use in code
-```python
-from src.inference import load_model_and_preprocessor, predict_churn
-
-model, preprocessor, metadata = load_model_and_preprocessor()
-
-result = predict_churn({
-    'Customer_Age': 45,
-    'Gender': 'M',
-    'Credit_Limit': 12000,
-    'Total_Trans_Amt': 5000,
-    'Total_Trans_Ct': 42,
-    # ... other features
-}, model, preprocessor, metadata)
-
-print(result['churn_probability'])  # e.g. 0.73
-print(result['risk_level'])         # "High"
-```
 
 ---
 
