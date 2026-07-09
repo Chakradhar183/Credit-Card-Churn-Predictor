@@ -1,338 +1,221 @@
-# 🏦 Credit Card Customer Churn Analysis & Prediction
+# Credit Card Customer Churn Prediction
 
-<div align="center">
+End-to-end machine learning project that predicts which credit card customers are likely to churn, built with Python, XGBoost, and Streamlit.
 
 ![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
-![ML](https://img.shields.io/badge/ML-Classification-orange.svg)
-![Status](https://img.shields.io/badge/Status-Production_Ready-success.svg)
 
-**An end-to-end production-ready Machine Learning system for predicting credit card customer churn**
-
-[Features](#-key-features) • [Installation](#-installation) • [Usage](#-usage) • [Model Performance](#-model-performance) • [Deployment](#-deployment)
-
-</div>
+**Live Demo:** [bankchurnerscsv-guwhaaalen4z8x8gkkht5s.streamlit.app](https://bankchurnerscsv-guwhaaalen4z8x8gkkht5s.streamlit.app/)
 
 ---
 
-## 📋 Table of Contents
+## Project Overview
 
-- [Problem Statement](#-problem-statement)
-- [Key Features](#-key-features)
-- [Project Structure](#-project-structure)
-- [Installation](#-installation)
-- [Usage](#-usage)
-- [Model Performance](#-model-performance)
-- [Deployment](#-deployment)
-- [Technologies Used](#-technologies-used)
-- [Business Impact](#-business-impact)
-- [Future Enhancements](#-future-enhancements)
-- [Contributing](#-contributing)
-- [License](#-license)
+Customer churn is expensive. Acquiring a new banking customer costs 5 to 25 times more than retaining an existing one. This project builds a classification pipeline to flag at-risk customers before they leave, giving retention teams time to act.
+
+The pipeline covers everything from data cleaning and feature engineering to model training and a live Streamlit dashboard. You can input a single customer's details and get back a churn probability with a risk level (Low, Medium, or High), or explore the full dataset through interactive charts and filters.
+
+The best performing model is XGBoost, which achieved **0.99 ROC-AUC** and **0.90 F1-score** on the test set.
 
 ---
 
-## 🎯 Problem Statement
+## Features
 
-Customer churn is a critical challenge for credit card companies. Losing customers means:
-- **Revenue Loss**: Lost transaction fees and interest income
-- **High Acquisition Costs**: 5-25x more expensive to acquire new customers than retain existing ones
-- **Market Share Erosion**: Competitors gain your customers
-
-This project builds a predictive system to identify at-risk customers **before** they churn, enabling:
-- Proactive retention campaigns
-- Personalized offers for high-risk customers
-- Optimized marketing spend
-
-**Business Goal**: Reduce churn rate by 15% through targeted interventions
+- Trains and compares 4 classification models (Logistic Regression, Decision Tree, Random Forest, XGBoost)
+- Custom feature engineering with 9 derived features like credit utilization ratio, transaction frequency, and relationship depth score
+- Handles class imbalance using SMOTE and class weighting
+- Streamlit web app with two pages: single-customer prediction and a full analytics dashboard
+- Interactive Plotly charts with filters for gender, income, card type, age range, and risk level
+- Batch predictions across the full dataset with downloadable CSV export
+- Model persistence using joblib (model, preprocessor, and metadata saved separately)
 
 ---
 
-## ✨ Key Features
+## Tech Stack
 
-### 🔬 **Production-Ready ML Pipeline**
-- 5 state-of-the-art algorithms (Logistic Regression, Decision Tree, Random Forest, XGBoost, LightGBM)
-- Automated hyperparameter tuning with cross-validation
-- SMOTE-based class imbalance handling
-- Stratified sampling for unbiased evaluation
-
-### 📊 **Comprehensive EDA**
-- 30+ visualizations with business insights
-- Correlation analysis and outlier detection
-- Feature importance and interaction analysis
-
-### 🧠 **Model Explainability**
-- SHAP values for individual predictions
-- Feature importance analysis
-- Business-friendly churn driver explanations
-
-### 🚀 **Interactive Dashboard**
-- Real-time churn prediction
-- Risk level classification (Low/Medium/High)
-- KPI tracking and visualizations
-- Interactive filtering and exploration
-
-### 📈 **High Performance**
-- **ROC-AUC**: 0.92+
-- **F1-Score**: 0.88+
-- **Recall**: 0.90+ (catches 90% of churners)
+| Category | Tools |
+|----------|-------|
+| Language | Python 3.9+ |
+| Data Processing | pandas, NumPy |
+| ML / Modeling | scikit-learn, XGBoost |
+| Class Imbalance | imbalanced-learn (SMOTE) |
+| Visualization | Matplotlib, Seaborn, Plotly |
+| Explainability | SHAP |
+| Web App | Streamlit |
+| Serialization | joblib |
 
 ---
 
-## 📁 Project Structure
+## Dataset
+
+**Source:** [Credit Card Customers, Sakshi Goyal (Kaggle)](https://www.kaggle.com/datasets/sakshigoyal7/credit-card-customers)
+
+- 10,127 customers, 23 features
+- Target: `Attrition_Flag` (Existing Customer vs. Attrited Customer)
+- Class split: roughly 84% retained, 16% churned
+- The original dataset includes two Naive Bayes classifier columns at the end that leak the target. These are dropped during preprocessing.
+
+---
+
+## Project Workflow
+
+```
+Raw Data (Kaggle CSV)
+    |
+    v
+Preprocessing
+    - Drop leaky columns (Naive Bayes outputs)
+    - Encode categoricals (ordinal for education/income, one-hot for gender/marital/card)
+    - StandardScaler on all numeric features
+    - Stratified train-test split
+    - SMOTE on training set only
+    |
+    v
+Feature Engineering (9 new features)
+    - Credit_Utilization_Ratio (revolving balance / credit limit)
+    - Avg_Transaction_Value (total amount / transaction count)
+    - Monthly_Transaction_Frequency (transactions per month)
+    - Relationship_Depth_Score (weighted score of products, tenure, activity; 0-100)
+    - Inactivity_Score (months inactive / 12)
+    - Contact_Intensity, Credit_To_Transaction_Ratio, and others
+    |
+    v
+Model Training (4 classifiers)
+    - Logistic Regression, Decision Tree, Random Forest, XGBoost
+    - Compared on accuracy, precision, recall, F1, ROC-AUC
+    - Best model auto-saved to models/
+    |
+    v
+Streamlit Dashboard
+    - Single customer prediction with gauge chart
+    - Full dataset analytics with interactive filters
+```
+
+---
+
+## Models Used
+
+| Model | Why |
+|-------|-----|
+| Logistic Regression | Simple baseline, interpretable coefficients |
+| Decision Tree | Non-linear splits, easy to visualize |
+| Random Forest | Ensemble of trees, reduces overfitting |
+| XGBoost | Gradient boosting, strong on tabular data |
+
+All models use `class_weight='balanced'` or equivalent (`scale_pos_weight` for XGBoost) to handle the 84/16 class imbalance.
+
+---
+
+## Results
+
+All metrics are from the held-out test set. These numbers come directly from `models/model_comparison.csv`.
+
+| Model | Accuracy | Precision | Recall | F1 | ROC-AUC |
+|-------|----------|-----------|--------|-----|---------|
+| **XGBoost** | 0.970 | 0.931 | 0.877 | 0.903 | **0.993** |
+| Random Forest | 0.958 | 0.864 | 0.877 | 0.870 | 0.988 |
+| Decision Tree | 0.931 | 0.758 | 0.840 | 0.797 | 0.914 |
+| Logistic Regression | 0.877 | 0.582 | 0.831 | 0.684 | 0.943 |
+
+XGBoost performed best across all metrics. The ROC-AUC of 0.99 is high, but I verified there is no data leakage: the Naive Bayes columns are dropped, and SMOTE is applied only after the train-test split. The features in this dataset are simply very predictive of churn.
+
+**Top churn drivers (by feature importance):**
+- Total transaction count and amount: customers who stop transacting are the most likely to leave
+- Total revolving balance: lower balance correlates with lower engagement
+- Credit utilization ratio: similar pattern
+
+---
+
+## Project Structure
 
 ```
 CustomerChurn/
-├── 📂 data/
-│   ├── raw/                    # Original Kaggle dataset
-│   └── processed/              # Cleaned, feature-engineered data
-├── 📂 notebooks/               # Jupyter notebooks for exploration
-│   ├── 01_business_understanding.ipynb
-│   ├── 02_data_understanding.ipynb
-│   ├── 03_eda.ipynb           # Comprehensive visualizations
-│   ├── 04_preprocessing.ipynb
-│   ├── 05_feature_engineering.ipynb
-│   ├── 06_model_training.ipynb
-│   ├── 07_model_evaluation.ipynb
-│   └── 08_model_explainability.ipynb
-├── 📂 src/                     # Production code
-│   ├── preprocessing.py        # Data cleaning pipeline
-│   ├── feature_engineering.py  # Feature creation
-│   ├── train.py               # Model training script
-│   ├── inference.py           # Prediction interface
-│   └── utils.py               # Helper functions
-├── 📂 app/                     # Streamlit web application
-│   ├── app.py                 # Main dashboard
-│   └── components/            # UI components
-├── 📂 models/                  # Trained models (saved)
-├── 📂 docs/                    # Documentation
-│   ├── business_understanding.md
-│   ├── model_evaluation_report.md
-│   ├── deployment_guide.md
-│   └── interview_prep.md      # Resume bullets & Q&A
-├── 📂 tests/                   # Unit tests
+├── data/
+│   ├── raw/                     # Original Kaggle CSV
+│   └── processed/               # Cleaned + feature-engineered data
+├── src/
+│   ├── preprocessing.py         # Encoding, scaling, SMOTE, train-test split
+│   ├── feature_engineering.py   # 9 derived features
+│   ├── train.py                 # Trains 4 models, selects and saves the best
+│   ├── inference.py             # Loads saved model and runs predictions
+│   ├── eda.py                   # Exploratory data analysis helpers
+│   └── __init__.py
+├── app/
+│   ├── app.py                   # Streamlit dashboard (prediction + analytics)
+│   ├── assets/
+│   └── components/
+├── models/
+│   ├── best_model.pkl           # Trained XGBoost model
+│   ├── preprocessor.pkl         # Scaler + label encoders
+│   ├── model_metadata.pkl       # Feature names, metrics, training date
+│   └── model_comparison.csv     # All model results side by side
 ├── requirements.txt
 └── README.md
 ```
 
 ---
 
-## 🛠️ Installation
+## Installation
 
-### Prerequisites
-- Python 3.9+
-- pip package manager
-- (Optional) Kaggle API credentials for dataset download
+**Prerequisites:** Python 3.9+ and pip.
 
-### Step 1: Clone Repository
 ```bash
-git clone https://github.com/yourusername/CustomerChurn.git
-cd CustomerChurn
-```
+git clone https://github.com/Chakradhar183/Credit-Card-Churn-Predictor.git
+cd Credit-Card-Churn-Predictor
 
-### Step 2: Create Virtual Environment
-```bash
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
+venv\Scripts\activate        # Windows
+# source venv/bin/activate   # Mac/Linux
 
-### Step 3: Install Dependencies
-```bash
 pip install -r requirements.txt
 ```
 
-### Step 4: Download Dataset
-**Option A - Manual**: Download from [Kaggle](https://www.kaggle.com/datasets/sakshigoyal7/credit-card-customers) and place in `data/raw/`
+**Download the dataset:** Get it from [Kaggle](https://www.kaggle.com/datasets/sakshigoyal7/credit-card-customers) and place the CSV in `data/raw/`.
 
-**Option B - Kaggle API**:
+Or use the Kaggle CLI:
 ```bash
 kaggle datasets download -d sakshigoyal7/credit-card-customers -p data/raw/ --unzip
 ```
 
 ---
 
-## 🚀 Usage
+## Usage
 
-### 1. Train the Model
+### Train the model
 ```bash
 python src/train.py
 ```
-This will:
-- Load and preprocess data
-- Engineer features
-- Train 5 models
-- Perform hyperparameter tuning
-- Save the best model to `models/best_model.pkl`
+This preprocesses the data, engineers features, trains all four models, prints a comparison table, and saves the best model to `models/`.
 
-### 2. Run the Dashboard
+### Launch the dashboard
 ```bash
 streamlit run app/app.py
 ```
-Access the app at `http://localhost:8501`
+Opens at `http://localhost:8501`. The app has two pages:
+- **Prediction** - enter customer details and get a churn probability with a gauge chart and risk level
+- **Dashboard** - explore the dataset with filters for gender, income, card type, age, and risk level; view distribution charts and a table of the top 50 highest-risk customers
 
-### 3. Make Predictions (Python API)
+### Use in code
 ```python
-from src.inference import ChurnPredictor
+from src.inference import load_model_and_preprocessor, predict_churn
 
-predictor = ChurnPredictor()
-result = predictor.predict({
+model, preprocessor, metadata = load_model_and_preprocessor()
+
+result = predict_churn({
     'Customer_Age': 45,
     'Gender': 'M',
     'Credit_Limit': 12000,
     'Total_Trans_Amt': 5000,
+    'Total_Trans_Ct': 42,
     # ... other features
-})
+}, model, preprocessor, metadata)
 
-print(f"Churn Probability: {result['probability']:.2%}")
-print(f"Risk Level: {result['risk_level']}")
-```
-
-### 4. Explore Notebooks
-```bash
-jupyter notebook
-```
-Navigate to `notebooks/` and run each notebook sequentially.
-
----
-
-## 📊 Model Performance
-
-### Best Model: **XGBoost Classifier**
-
-| Metric | Score |
-|--------|-------|
-| **ROC-AUC** | 0.923 |
-| **Accuracy** | 0.917 |
-| **Precision** | 0.891 |
-| **Recall** | 0.904 |
-| **F1-Score** | 0.897 |
-
-### Model Comparison
-
-| Model | ROC-AUC | F1-Score | Training Time |
-|-------|---------|----------|---------------|
-| Logistic Regression | 0.867 | 0.821 | 2s |
-| Decision Tree | 0.798 | 0.765 | 3s |
-| **Random Forest** | 0.915 | 0.889 | 45s |
-| **XGBoost** | **0.923** | **0.897** | 52s |
-| LightGBM | 0.919 | 0.892 | 38s |
-
-### Top Churn Drivers
-1. Total Transaction Count (26% importance)
-2. Total Transaction Amount (22% importance)
-3. Total Revolving Balance (14% importance)
-4. Credit Utilization Ratio (12% importance)
-5. Customer Age (9% importance)
-
-**Business Insight**: Customers with declining transaction activity are 3.5x more likely to churn.
-
----
-
-## 🌐 Deployment
-
-### Streamlit Cloud (Recommended - Free)
-1. Push code to GitHub
-2. Visit [streamlit.io/cloud](https://streamlit.io/cloud)
-3. Connect repository and deploy
-4. Access your app at `https://yourapp.streamlit.app`
-
-### Render
-```bash
-# See docs/deployment_guide.md for detailed instructions
-```
-
-### Hugging Face Spaces
-```bash
-# Upload to HF Spaces with Streamlit SDK
-```
-
-### Docker (Coming Soon)
-```dockerfile
-# Containerized deployment for enterprise environments
+print(result['churn_probability'])  # e.g. 0.73
+print(result['risk_level'])         # "High"
 ```
 
 ---
 
-## 🛠️ Technologies Used
+## License
 
-| Category | Technologies |
-|----------|-------------|
-| **Languages** | Python 3.9+ |
-| **ML Libraries** | scikit-learn, XGBoost, LightGBM |
-| **Data Processing** | pandas, NumPy |
-| **Visualization** | Matplotlib, Seaborn, Plotly |
-| **Explainability** | SHAP |
-| **Web Framework** | Streamlit |
-| **Imbalance Handling** | imbalanced-learn (SMOTE) |
-| **Model Persistence** | joblib |
-
----
-
-## 💼 Business Impact
-
-### Projected ROI
-- **Retention Improvement**: 15% churn reduction
-- **Revenue Saved**: $2.4M annually (assuming 10K customers, $200 avg lifetime value)
-- **Campaign Efficiency**: 40% better targeting vs random outreach
-
-### Use Cases
-1. **Marketing**: Targeted retention offers for high-risk customers
-2. **CRM**: Proactive customer success outreach
-3. **Product**: Identify features that drive retention
-4. **Executive**: Real-time churn monitoring dashboard
-
----
-
-## 🔮 Future Enhancements
-
-- [ ] **Real-time Predictions**: Kafka/REST API integration
-- [ ] **Model Monitoring**: MLflow for experiment tracking and drift detection
-- [ ] **A/B Testing Framework**: Measure campaign effectiveness
-- [ ] **Deep Learning**: LSTM for time-series churn prediction
-- [ ] **Multi-model Ensemble**: Stack multiple models for higher accuracy
-- [ ] **Customer Segmentation**: K-means clustering for personalized strategies
-- [ ] **Explainable AI Dashboard**: Interactive SHAP visualizations
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please:
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 👤 Author
-
-**Your Name**
-- GitHub: [@yourusername](https://github.com/yourusername)
-- LinkedIn: [Your LinkedIn](https://linkedin.com/in/yourprofile)
-- Email: your.email@example.com
-
----
-
-## 🙏 Acknowledgments
-
-- Dataset: [Sakshi Goyal - Kaggle](https://www.kaggle.com/datasets/sakshigoyal7/credit-card-customers)
-- Inspiration: Real-world credit card churn problems
-- Community: scikit-learn, XGBoost, and Streamlit teams
-
----
-
-<div align="center">
-
-**⭐ Star this repository if you found it helpful!**
-
-Made with ❤️ for the Data Science community
-
-</div>
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
